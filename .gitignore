@@ -1,0 +1,11 @@
+**/__pycache__/
+.venv/
+*.tmp
+*.dblite
+build/
+dist/
+*.json
+*.spec
+*.pyc
+*.ico
+.idea/
