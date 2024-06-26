@@ -9,3 +9,5 @@ dist/
 *.pyc
 *.ico
 .idea/
+test/
+bak_*

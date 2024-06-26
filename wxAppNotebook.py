@@ -2,11 +2,14 @@ import os
 import time
 
 import wx
-from wxNotebook import MyFrame1
-from utils import from_github_json_load, from_local_json_get_nodes, get_plugin, from_plugin_get_nodes
-from getNodeName import sync_json
 
-json_path = os.path.join(os.path.dirname(__file__), "nodeName.json")
+from utils.getNodeName import sync_json
+from utils.showRequirements import show_requirements
+from utils.utils import from_github_json_load, from_local_json_get_nodes, get_plugin, from_plugin_get_nodes
+from wxNotebook import MyFrame1
+
+base_path = os.path.dirname(__file__)
+json_path = os.path.join(base_path, "nodeName.json")
 # print(json_path)
 if os.path.exists(json_path):
     nodes_json = from_github_json_load()
@@ -17,6 +20,11 @@ else:
 
 
 class MainWin(MyFrame1):
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.m_textCtrl4.SetValue(r"C:\Ai\ComfyUI")
+        self.m_textCtrl4_2.SetValue(r"transformers")
+
     def btnOk1(self, event):
         if self.m_filePicker1.GetPath() == "":
             self.m_richText1.SetValue("Select a JSON file.")
@@ -75,16 +83,48 @@ class MainWin(MyFrame1):
         self.m_textCtrl3.SetValue("")
         self.m_richText3.SetValue("")
 
+    def btnOk4(self, event):
+        self.m_dataViewListCtrl4.DeleteAllItems()
+        if self.m_textCtrl4.GetValue() == "" or self.m_textCtrl4_2.GetValue() == "":
+            self.m_dataViewListCtrl4.AppendItem(["在上面文本框", "输入 ComfyUI 完整路径、Python 包名称", ""])
+        else:
+            addr = self.m_textCtrl4.GetValue()
+            addr = os.path.join(addr, "custom_nodes")
+            pip_name = self.m_textCtrl4_2.GetValue()
+            dict_all = show_requirements(addr)
+            num = 1
+            for key, value in dict_all.items():
+                # if any((match := one) in pip_name for one in value):
+                for one in value:
+                    if pip_name.upper() in one.upper():
+                        self.m_dataViewListCtrl4.AppendItem([str(num), key, one])
+                        num += 1
+
+    def btnCancel4(self, event):
+        self.m_textCtrl4.SetValue("")
+        self.m_textCtrl4_2.SetValue("")
+        self.m_dataViewListCtrl4.DeleteAllItems()
+
+    def colSort(self, event):
+        flag = 1
+        a = event.GetColumn()
+        col = self.m_dataViewListCtrl4.GetColumn(a)
+        print(a)
+
+        col.SetSortOrder(ascending=False)
+        self.m_dataViewListCtrl4.Refresh()
+
     def sync_json(self, event):
-        self.m_staticText8.SetLabel("正在同步...")
+        self.m_staticText0.SetLabel("正在同步...")
         t = sync_json()
         print(t)
         if t:
-            self.m_staticText8.SetLabel("同步成功.")
+            self.m_staticText0.SetLabel("同步成功.")
             time.sleep(1)
-            self.m_staticText8.SetLabel("工具运行依赖 nodeName.json 文件，打开工具时会自动更新/生成，网络异常可能会失败，可以点击上面按钮同步.")
+            self.m_staticText0.SetLabel(
+                "工具运行依赖 nodeName.json 文件，打开工具时会自动更新/生成，网络异常可能会失败，可以点击上面按钮同步.")
         else:
-            self.m_staticText8.SetLabel("同步失败.")
+            self.m_staticText0.SetLabel("同步失败.")
 
 
 """

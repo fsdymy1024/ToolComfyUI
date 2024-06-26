@@ -1,5 +1,9 @@
-import requests
 import json
+import os.path
+
+import requests
+
+from utils.utils import base_path
 
 
 def sync_json():
@@ -12,7 +16,7 @@ def sync_json():
 
     if r.status_code == 200 or r.status_code == 304:
         data = r.json()
-        with open("nodeName.json", "w", encoding="utf8") as outfile:
+        with open(os.path.join(base_path, "nodeName.json"), "w", encoding="utf8") as outfile:
             json.dump(data, outfile, indent=4, sort_keys=True)
         return 1
     else:

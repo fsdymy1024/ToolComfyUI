@@ -1,4 +1,7 @@
 import json
+import os
+
+base_path = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
 
 
 def from_local_json_get_nodes(json_path):
@@ -24,7 +27,9 @@ def from_github_json_load():
     :return:
     """
     node_file = "nodeName.json"
-    with open(node_file, "r", encoding="utf8") as f:
+    file_json = os.path.join(base_path, node_file)
+    # print(file_json)
+    with open(file_json, "r", encoding="utf8") as f:
         nodes_json = json.load(f)
     return nodes_json
 
@@ -38,11 +43,11 @@ def get_plugin(f_node_name, f_nodes):
     """
     data = []
     for key, value in f_nodes.items():
-        element_to_find = f_node_name
         # print(value[0])
-        if element_to_find in value[0]:
-            txt = f"节点 {element_to_find} 在插件 {key}"
-            data.append(txt)
+        for node in value[0]:
+            if f_node_name.lower() == node.lower():
+                txt = f"节点 {node} 在插件 {key}"
+                data.append(txt)
     return data
 
 
